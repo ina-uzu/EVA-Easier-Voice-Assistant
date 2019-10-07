@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_restful import Resource, Api
+from flask_restful import Resource,reqparse, Api
 from dao import userdao
 
 app = Flask(__name__)
@@ -14,9 +14,16 @@ def hello_world():
 def getAllUser():
     return userdao.getAllUsers()
 
-@app.route('/user/<name>', methods=['POST'])
+@app.route('/user', methods=['POST'])
 def createUser():
-    return userdao.createUser(name)
+    try:
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', required=True, type=str, help='name cannot be blank')
+        args = parser.parse_args()
+        return userdao.createUser(str(args['name']))
+    except Exception as e :
+        return {'error': str(e)}
+
 
 class test(Resource):
     def post(self):
