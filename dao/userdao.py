@@ -5,15 +5,16 @@ import json
 import pymysql
 
 def getConnection():
-    return pymysql.connect(host='14.39.244.135', port=3306, user='root', password='ina@kokoho97',
+    return pymysql.connect(host='localhost', port=3306, user='root', password='ina@kokoho97',
                            db='eva', charset='utf8')
+
+def user_handler(obj):
+    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
 def createUser(name):
     conn = getConnection()
-
-    #curs = conn.cursor(pymysql.cursors.DictCursor)
     curs = conn.cursor()
-    ok = cur.execute("INSERT INTO use(name, create_datetime) VALUES (%s, now())",(name))
+    ok = curs.execute("INSERT INTO user(name, create_datetime) VALUES (%s, now())", name)
     conn.commit()
     conn.close()
 
@@ -30,4 +31,4 @@ def getAllUsers():
     rows = curs.fetchall()
     conn.close()
 
-    return json.dumps(rows)
+    return json.dumps(rows, default=user_handler)
