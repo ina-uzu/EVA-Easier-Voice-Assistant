@@ -9,7 +9,6 @@ api = Api(app)
 def hello_world():
     return 'Hello World!'
 
-
 @app.route('/user', methods=['GET'])
 def getAllUser():
     return userdao.getAllUsers()
