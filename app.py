@@ -7,7 +7,7 @@ api = Api(app)
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return 'Easier Voice Assistant'
 
 @app.route('/user', methods=['GET'])
 def getAllUser():
