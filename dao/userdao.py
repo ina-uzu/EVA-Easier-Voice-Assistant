@@ -8,6 +8,9 @@ def getConnection():
 def user_handler(obj):
     return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
+def user_handler(obj):
+    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
+
 def createUser(name):
     conn = getConnection()
     curs = conn.cursor()
