@@ -107,7 +107,6 @@ def delete_shortcut_by_keyword():
         return {'error': str(e)}
 
 
-
 @app.route('/shortcut', methods=['DELETE'])
 def find_all_shortcuts():
     try:
