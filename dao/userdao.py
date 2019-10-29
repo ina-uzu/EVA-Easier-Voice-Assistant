@@ -23,7 +23,7 @@ def add(name):
     return json.dumps({'rows': ok})
 
 
-def fina_all():
+def find_all():
     conn = get_connection()
 
     curs = conn.cursor(pymysql.cursors.DictCursor)

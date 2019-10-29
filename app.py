@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import request
 from flask_restful import Resource,reqparse, Api
 from dao import userdao, shortcutdao
 
@@ -35,20 +36,21 @@ def get_all_shortcuts():
         args = parser.parse_args()
         return shortcutdao.find_by_user(args['user_id'])
 
-    except Exception as e :
+    except Exception as e:
         return {'error': str(e)}
 
 
 @app.route('/shortcut', methods=['POST'])
 def create_shortcut():
+    print(request.args)
     try:
-        parser = reqparse.RequestParser()
-        parser.add_argument('user_id', required=True, type=int, help='user_id cannot be blank')
-        parser.add_argument('keyword', required=True, type=str, help='keyword cannot be blank')
-        parser.add_argument('command', required=True, type=str, help='command cannot be blank')
-        args = parser.parse_args()
+        if 'user_id' in request.args:
+            user_id = request.args['user_id']
 
-        return shortcutdao.add(int(args['user_id']), str(args['keyword']), str(args['command]']))
+            if 'keyword' in request.args and 'command' in request.args :
+                return shortcutdao.add(user_id, request.args['keyword'], request.args['command'])
+        else:
+            print("user_id REQUIRED")
 
     except Exception as e:
         return {'error': str(e)}

@@ -15,8 +15,11 @@ def shortcut_handler(obj):
 def add(user_id, keyword, command):
     conn = get_connection()
     curs = conn.cursor()
-    ok = curs.execute("INSERT INTO shortcut(user_id, keyword, command, create_datetime) VALUES (%d,%s,%s, now())",
-                      user_id, keyword, command)
+
+    sql = "INSERT INTO shortcut(user_id, keyword, command, create_datetime) VALUES (%s,%s,%s, now())"
+    param = (int(user_id), keyword, command)
+
+    ok = curs.execute(sql,param)
     conn.commit()
     conn.close()
     return json.dumps({'rows': ok})
@@ -26,7 +29,7 @@ def find_by_user(user_id):
     conn = get_connection()
 
     curs = conn.cursor(pymysql.cursors.DictCursor)
-    sql = "SELECT * FROM shortcut WHERE user_id is %d" % user_id
+    sql = "SELECT * FROM shortcut WHERE user_id = %d" % user_id
     curs.execute(sql)
 
     rows = curs.fetchall()
