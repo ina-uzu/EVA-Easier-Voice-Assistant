@@ -23,6 +23,26 @@ def add(name):
     return json.dumps({'rows': ok})
 
 
+def delete_by_id(user_id):
+    conn = get_connection()
+    curs = conn.cursor()
+    ok = curs.execute("UPDATE user SET delete_datetime = now() WHERE id = %s", int(user_id))
+    conn.commit()
+    conn.close()
+
+    return json.dumps({'rows': ok})
+
+
+def find_by_id(user_id):
+    conn = get_connection()
+    curs = conn.cursor()
+    ok = curs.execute("SELECT * FROM user WHERE id = %s", int(user_id))
+    conn.commit()
+    conn.close()
+
+    return json.dumps({'rows': ok})
+
+
 def find_all():
     conn = get_connection()
 
