@@ -140,6 +140,30 @@ def find_shortcut_by_keyword():
         return {'error': str(e)}
 
 
+@app.route('/stt', methods=['POST'])
+def send_stt():
+    try:
+        if 'stt' in request.args:
+            stt = request.args['stt']
+            return stt
+        else:
+            print("stt REQUIRED")
+
+    except Exception as e:
+        return {'error': str(e)}
+
+
+@app.route('/voice', methods=['POST'])
+def send_voice():
+    try:
+        if 'voice' in request.args:
+
+        else:
+            print("stt REQUIRED")
+
+    except Exception as e:
+        return {'error': str(e)}
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
