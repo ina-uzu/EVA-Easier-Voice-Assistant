@@ -1,0 +1,11 @@
+// docker container 목록 보기
+docker ps  ( -a : 실행 중인 것만 보기 옵션)
+
+
+// docker image & container 새로 생성 및 run
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+docker rmi 
+docker build -t eva .
+docker run -d -p 5000:5000 --name eva eva
+
