@@ -24,7 +24,7 @@ def create_user():
 
 
 @app.route('/user', methods=['DELETE'])
-def find_user_by_id(u):
+def delete_user_by_id():
     try:
         if 'user_id' in request.args:
             user_id = request.args['user_id']
