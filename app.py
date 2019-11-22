@@ -1,161 +1,124 @@
 from flask import Flask
 from flask import request
-from flask_restful import Resource,reqparse, Api
-from flask_restful_swagger import swagger
+from flask_restplus import Resource, Api
 from dao import userdao, shortcutdao
 
 app = Flask(__name__)
-#api = Api(app)
-
-###################################
-# Wrap the Api with swagger.docs. It is a thin wrapper around the Api class that adds some swagger smarts
-api = swagger.docs(Api(app), apiVersion='0.1')
-###################################
-
-@app.route('/')
-def hello_world():
-    return 'Easier Voice Assistant'
+api = Api(app, version='1.0', title='EVA API', description='Easier Voice Assistant')
+ns = api.namespace('user', description='User CRD')
+sc_ns = api.namespace('shortcut', description='Shortcut CRD')
+stt_ns = api.namespace('stt', description = 'stt 전송')
 
 
-@app.route('/user', methods=['POST'])
-def create_user():
-    try:
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', required=True, type=str, help='name cannot be blank')
-        args = parser.parse_args()
-        return userdao.add(str(args['name']))
-    except Exception as e :
-        return {'error': str(e)}
+@ns.route('/', methods=['GET', 'POST'])
+class UserManager(Resource):
+    def get(self):
+        try:
+            return userdao.find_all()
+
+        except Exception as e:
+            return {'error': str(e)}
+
+    @ns.param('name', '사용자 이름을 입력하세요')
+    def post(self):
+        try:
+            if 'name' in request.args:
+                name = request.args['name']
+                return userdao.add(name)
+            else:
+                print("name REQUIRED")
+
+        except Exception as e:
+            return {'error': str(e)}
 
 
-@app.route('/user', methods=['DELETE'])
-def delete_user_by_id():
-    try:
-        if 'user_id' in request.args:
-            user_id = request.args['user_id']
-            return userdao.delete_by_id(user_id)
-        else:
-            print("user_id REQUIRED")
+@ns.route('/<int:id>', methods=['GET', 'DELETE'])
+class UserManager(Resource):
+    def get(self, id):
+        try:
+            print(id)
+            return userdao.find_by_id(id)
 
-    except Exception as e:
-        return {'error': str(e)}
+        except Exception as e:
+            return {'error': str(e)}
 
+    def delete(self, id):
+        try:
+            return userdao.delete_by_id(id)
 
-@app.route('/user', methods=['GET'])
-def find_all_users():
-    return userdao.find_all()
-
-
-@app.route('/user', methods=['GET'])
-def find_user_by_id(u):
-    try:
-        if 'user_id' in request.args:
-            user_id = request.args['user_id']
-            return userdao.find_by_id(user_id)
-
-        else:
-            print("user_id REQUIRED")
-
-    except Exception as e:
-        return {'error': str(e)}
+        except Exception as e:
+            return {'error': str(e)}
 
 
-@app.route('/shortcut', methods=['POST'])
-def create_shortcut():
-    print(request.args)
-    try:
-        if 'user_id' in request.args:
-            user_id = request.args['user_id']
+@sc_ns.route('/', methods=['GET', 'DELETE'])
+class ShortcutManager(Resource):
+    def get(self):
+        try:
+            return shortcutdao.find_all()
 
+        except Exception as e:
+            return {'error': str(e)}
+
+    def delete(self):
+        try:
+            return shortcutdao.delete_all()
+
+        except Exception as e:
+            return {'error': str(e)}
+
+
+@sc_ns.route('/<int:user_id>', methods=['GET', 'POST', 'DELETE'])
+class ShortcutMangerWithUser(Resource):
+    @ns.param('keyword', '검색할 단축키를 입력하세요')
+    def get(self, user_id):
+        try:
+            if 'keyword' in request.args:
+                return shortcutdao.find_by_keyword(user_id, request.args['keyword'])
+
+            else:
+                return shortcutdao.find_by_user(user_id)
+
+        except Exception as e:
+            return {'error': str(e)}
+
+    @ns.param('keyword', '단축키로 등록할 단어를 입력하세요')
+    @ns.param('command', '단축키에 맵핑시킬 기능을 입력하세요')
+    def post(self,user_id):
+        try:
             if 'keyword' in request.args and 'command' in request.args:
                 return shortcutdao.add(user_id, request.args['keyword'], request.args['command'])
 
             else:
                 print("keyword & command REQUIRED")
-        else:
-            print("user_id REQUIRED")
 
-    except Exception as e:
-        return {'error': str(e)}
+        except Exception as e:
+            return {'error': str(e)}
 
-
-@app.route('/shortcut/delete', methods=['DELETE'])
-def delete_all_shortcuts():
-    try:
-        if 'user_id' in request.args:
-            user_id = request.args['user_id']
-            return shortcutdao.delete_all(user_id)
-
-        else:
-            print("user_id REQUIRED")
-
-    except Exception as e:
-        return {'error': str(e)}
-
-
-@app.route('/shortcut', methods=['DELETE'])
-def delete_shortcut_by_keyword():
-    try:
-        if 'user_id' in request.args:
-            user_id = request.args['user_id']
-
+    @ns.param('keyword', '삭제찰 단축키를 입력하세요')
+    def delete(self, user_id):
+        try:
             if 'keyword' in request.args:
                 return shortcutdao.delete_by_keyword(user_id, request.args['keyword'])
 
             else:
-                print("keyword REQUIRED")
+                return shortcutdao.delete_by_user(user_id)
 
-        else:
-            print("user_id REQUIRED")
-
-    except Exception as e:
-        return {'error': str(e)}
+        except Exception as e:
+            return {'error': str(e)}
 
 
-@app.route('/shortcut', methods=['DELETE'])
-def find_all_shortcuts():
-    try:
-        if 'user_id' in request.args:
-            user_id = request.args['user_id']
-            return shortcutdao.find_all(user_id)
-
-        else:
-            print("user_id REQUIRED")
-
-    except Exception as e:
-        return {'error': str(e)}
-
-
-@app.route('/shortcut', methods=['DELETE'])
-def find_shortcut_by_keyword():
-    try:
-        if 'user_id' in request.args:
-            user_id = request.args['user_id']
-
-            if 'keyword' in request.args:
-                return shortcutdao.find_by_keyword(user_id, request.args['keyword'])
-
+@stt_ns.route('/', methods=['POST'])
+class DeviceManager(Resource):
+    def post(self):
+        try:
+            if 'stt' in request.args:
+                stt = request.args['stt']
+                return stt
             else:
-                print("keyword REQUIRED")
+                print("stt REQUIRED")
 
-        else:
-            print("user_id REQUIRED")
-
-    except Exception as e:
-        return {'error': str(e)}
-
-
-@app.route('/stt', methods=['POST'])
-def send_stt():
-    try:
-        if 'stt' in request.args:
-            stt = request.args['stt']
-            return stt
-        else:
-            print("stt REQUIRED")
-
-    except Exception as e:
-        return {'error': str(e)}
+        except Exception as e:
+            return {'error': str(e)}
 
 
 if __name__ == '__main__':

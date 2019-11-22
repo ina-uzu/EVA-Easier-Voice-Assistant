@@ -25,7 +25,20 @@ def add(user_id, keyword, command):
     return json.dumps({'rows': ok})
 
 
-def delete_all(user_id):
+def delete_all():
+    conn = get_connection()
+
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = "DELETE FORM shortcut WHERE id > 0"
+    curs.execute(sql)
+
+    rows = curs.fetchall()
+    conn.close()
+
+    return json.dumps(rows, default=shortcut_handler)
+
+
+def delete_by_user(user_id):
     conn = get_connection()
 
     curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -51,7 +64,20 @@ def delete_by_keyword(user_id, keyword):
     return json.dumps(rows, default=shortcut_handler)
 
 
-def find_all(user_id):
+def find_all():
+    conn = get_connection()
+
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = "SELECT * FROM shortcut"
+    curs.execute(sql)
+
+    rows = curs.fetchall()
+    conn.close()
+
+    return json.dumps(rows, default=shortcut_handler)
+
+
+def find_by_user(user_id):
     conn = get_connection()
 
     curs = conn.cursor(pymysql.cursors.DictCursor)
