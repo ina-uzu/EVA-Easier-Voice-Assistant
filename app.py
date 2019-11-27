@@ -1,7 +1,6 @@
 from flask import Flask
 from flask import request
 from flask_restplus import Resource, Api, fields
-import json
 from dao import userdao, shortcutdao
 
 app = Flask(__name__)
