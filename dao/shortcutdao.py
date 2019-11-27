@@ -1,6 +1,7 @@
 # -- coding: utf-8 --
 import json
 import pymysql
+from flask import jsonify
 
 
 def get_connection():
@@ -22,7 +23,7 @@ def add(user_id, keyword, command):
     ok = curs.execute(sql,param)
     conn.commit()
     conn.close()
-    return json.dumps({'rows': ok})
+    return json.dumps({'state': 'success'}, ensure_ascii=False)
 
 
 def delete_all():
@@ -35,7 +36,7 @@ def delete_all():
     rows = curs.fetchall()
     conn.close()
 
-    return json.dumps(rows, default=shortcut_handler)
+    return json.dumps(rows, default=shortcut_handler,ensure_ascii=False)
 
 
 def delete_by_user(user_id):
@@ -48,7 +49,7 @@ def delete_by_user(user_id):
     rows = curs.fetchall()
     conn.close()
 
-    return json.dumps(rows, default=shortcut_handler)
+    return json.dumps({'state': 'success'}, ensure_ascii=False)
 
 
 def delete_by_keyword(user_id, keyword):
@@ -61,7 +62,7 @@ def delete_by_keyword(user_id, keyword):
     rows = curs.fetchall()
     conn.close()
 
-    return json.dumps(rows, default=shortcut_handler)
+    return json.dumps({'state': 'success'}, ensure_ascii=False)
 
 
 def find_all():
@@ -74,7 +75,7 @@ def find_all():
     rows = curs.fetchall()
     conn.close()
 
-    return json.dumps(rows, default=shortcut_handler)
+    return json.dumps(rows, default=shortcut_handler,ensure_ascii=False)
 
 
 def find_by_user(user_id):
@@ -87,7 +88,7 @@ def find_by_user(user_id):
     rows = curs.fetchall()
     conn.close()
 
-    return json.dumps(rows, default=shortcut_handler)
+    return json.dumps(rows, default=shortcut_handler, ensure_ascii=False)
 
 
 def find_by_keyword(user_id, keyword):
@@ -100,4 +101,4 @@ def find_by_keyword(user_id, keyword):
     rows = curs.fetchall()
     conn.close()
 
-    return json.dumps(rows, default=shortcut_handler)
+    return json.dumps(rows, default=shortcut_handler, ensure_ascii=False)

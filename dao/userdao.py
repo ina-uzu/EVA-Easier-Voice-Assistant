@@ -20,7 +20,7 @@ def add(name):
     conn.commit()
     conn.close()
 
-    return json.dumps({'rows': ok})
+    return json.dumps({'state': 'Success'}, ensure_ascii=False)
 
 
 def delete_by_id(user_id):
@@ -30,17 +30,20 @@ def delete_by_id(user_id):
     conn.commit()
     conn.close()
 
-    return json.dumps({'rows': ok})
+    return json.dumps({'state': 'Success'}, ensure_ascii=False)
 
 
 def find_by_id(user_id):
     conn = get_connection()
     curs = conn.cursor()
-    ok = curs.execute("SELECT * FROM user WHERE id = %s", int(user_id))
+    curs.execute("SELECT * FROM user WHERE id = %s", int(user_id))
+    rows = curs.fetchall()
+
+    print(rows)
     conn.commit()
     conn.close()
 
-    return json.dumps({'rows': ok})
+    return json.dumps(rows, default=user_handler, ensure_ascii=False)
 
 
 def find_all():
@@ -53,4 +56,4 @@ def find_all():
     rows = curs.fetchall()
     conn.close()
 
-    return json.dumps(rows, default=user_handler)
+    return json.dumps(rows, default=user_handler, ensure_ascii=False)

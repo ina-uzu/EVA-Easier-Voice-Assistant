@@ -1,13 +1,40 @@
 from flask import Flask
 from flask import request
-from flask_restplus import Resource, Api
+from flask_restplus import Resource, Api, fields
+import json
 from dao import userdao, shortcutdao
 
 app = Flask(__name__)
 api = Api(app, version='1.0', title='EVA API', description='Easier Voice Assistant')
 ns = api.namespace('user', description='User CRD')
 sc_ns = api.namespace('shortcut', description='Shortcut CRD')
-stt_ns = api.namespace('stt', description = 'stt 전송')
+stt_ns = api.namespace('stt', description='stt 전송')
+
+user_model = api.model('Model', {
+    'id': fields.Integer,
+    'name': fields.String,
+})
+
+shortcut_model = api.model('Model', {
+    'id': fields.Integer,
+    'user_id': fields.Integer,
+    'keyword': fields.String,
+    'command': fields.String
+})
+
+
+class User(object):
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
+
+class Shortcut(object):
+    def __init__(self, id, user_id, keyword, command):
+        self.id = id
+        self.user_id = user_id
+        self.keyword = keyword
+        self.command = command
 
 
 @ns.route('/', methods=['GET', 'POST'])
@@ -36,8 +63,8 @@ class UserManager(Resource):
 class UserManager(Resource):
     def get(self, id):
         try:
-            print(id)
-            return userdao.find_by_id(id)
+            data = userdao.find_by_id(id)
+            return data
 
         except Exception as e:
             return {'error': str(e)}
@@ -83,7 +110,7 @@ class ShortcutMangerWithUser(Resource):
 
     @ns.param('keyword', '단축키로 등록할 단어를 입력하세요')
     @ns.param('command', '단축키에 맵핑시킬 기능을 입력하세요')
-    def post(self,user_id):
+    def post(self, user_id):
         try:
             if 'keyword' in request.args and 'command' in request.args:
                 return shortcutdao.add(user_id, request.args['keyword'], request.args['command'])
