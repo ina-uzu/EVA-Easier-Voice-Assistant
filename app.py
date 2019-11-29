@@ -1,4 +1,6 @@
-from flask import Flask
+import json
+
+from flask import Flask, make_response
 from flask import request
 from flask_restplus import Resource, Api, fields
 from dao import userdao, shortcutdao
@@ -8,6 +10,7 @@ api = Api(app, version='1.0', title='EVA API', description='Easier Voice Assista
 ns = api.namespace('user', description='User CRD')
 sc_ns = api.namespace('shortcut', description='Shortcut CRD')
 stt_ns = api.namespace('stt', description='stt 전송')
+cmd_ns = api.namespace('cmd', description='음성 + 단축키와 맵핑된 최종 명령어')
 
 user_model = api.model('Model', {
     'id': fields.Integer,
@@ -142,6 +145,38 @@ class DeviceManager(Resource):
                 return stt
             else:
                 print("stt REQUIRED")
+
+        except Exception as e:
+            return {'error': str(e)}
+
+
+@cmd_ns.route('/', methods=['POST'])
+class CmdManager(Resource):
+    @cmd_ns.param('stt', '단축키')
+    @cmd_ns.param('voice', '사용자 음성')
+    def post(self):
+        try:
+            if 'stt' in request.args and 'voice' in request.args:
+                stt = request.args['stt']
+                voice = request.args['voice']
+
+                user_id = 13
+                # user_id = mlModel.getUserInfo(voice)
+
+                str_data = shortcutdao.find_by_keyword(user_id, stt).replace('[','').replace(']','')
+                resp = {}
+
+                if len(str_data) == 0:
+                    resp["command"] = stt
+                    resp = make_response(resp)
+
+                else:
+                    resp = make_response(str_data)
+
+                return resp
+
+            else:
+                print("stt & voice REQUIRED")
 
         except Exception as e:
             return {'error': str(e)}
