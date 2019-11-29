@@ -4,9 +4,11 @@ import pymysql
 
 
 def get_connection():
-    return pymysql.connect(host='eva.c09iaudkjatg.ap-northeast-2.rds.amazonaws.com', port=3306, user='admin',
-                           password='evaeva2019',
-                           db='eva', charset='utf8')
+    file = open('../db_config', 'r')
+    host = file.readline()
+    pwd = file.readline()
+    file.close()
+    return pymysql.connect(host=host, port=3306, user='admin', password=pwd, db='eva', charset='utf8')
 
 
 def user_handler(obj):
