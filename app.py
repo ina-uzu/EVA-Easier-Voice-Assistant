@@ -150,7 +150,7 @@ class DeviceManager(Resource):
             return {'error': str(e)}
 
 
-@cmd_ns.route(methods=['POST'])
+@cmd_ns.route('/', methods=['POST'])
 class CmdManager(Resource):
     @cmd_ns.param('stt', '단축키')
     @cmd_ns.param('voice', '사용자 음성')

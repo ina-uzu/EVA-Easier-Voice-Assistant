@@ -4,9 +4,9 @@ import pymysql
 
 
 def get_connection():
-    file = open('../db_config', 'r')
-    host = file.readline()
-    pwd = file.readline()
+    file = open('db_config', 'r')
+    host = file.readline().replace('\n', '')
+    pwd = file.readline().replace('\n', '')
     file.close()
     return pymysql.connect(host=host, port=3306, user='admin', password=pwd, db='eva', charset='utf8')
 
