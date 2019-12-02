@@ -11,6 +11,7 @@ ns = api.namespace('user', description='User CRD')
 sc_ns = api.namespace('shortcut', description='Shortcut CRD')
 stt_ns = api.namespace('stt', description='stt 전송')
 cmd_ns = api.namespace('cmd', description='음성 + 단축키와 맵핑된 최종 명령어')
+test_ns = api.namespace('test2', descripiton='NUGU용 TEST API')
 
 user_model = api.model('Model', {
     'id': fields.Integer,
@@ -150,7 +151,7 @@ class DeviceManager(Resource):
             return {'error': str(e)}
 
 
-@cmd_ns.route('/', methods=['POST'])
+@cmd_ns.route('', methods=['POST'])
 class CmdManager(Resource):
     @cmd_ns.param('stt', '단축키')
     @cmd_ns.param('voice', '사용자 음성')
@@ -180,6 +181,66 @@ class CmdManager(Resource):
 
         except Exception as e:
             return {'error': str(e)}
+
+
+@test_ns.route('/', methods=['GET'])
+class TestManager(Resource):
+    @test_ns.param('stt', '단축키')
+    def get(self):
+        try:
+            if 'stt' in request.args:
+                stt = request.args['stt']
+                voice = 'TEST'
+                user_id = 1
+
+                str_data = shortcutdao.find_by_keyword(user_id, stt).replace('[', '').replace(']', '')
+                resp = {}
+                cmd = stt
+                if len(str_data) == 0:
+                    resp["command"] = stt
+                    resp = make_response(resp)
+
+                else:
+                    resp = make_response(str_data)
+
+                    dic = json.loads(str_data)
+                    cmd = dic["command"]
+                print(cmd)
+
+                return resp
+
+        except Exception as e:
+            return {'error': str(e)}
+
+
+@app.route('/test', methods=['GET'])
+def nugu_test():
+    try:
+        print(request.args)
+
+        if 'stt' in request.args:
+            stt = request.args['stt']
+            voice = 'TEST'
+            user_id = 1
+
+            str_data = shortcutdao.find_by_keyword(user_id, stt).replace('[', '').replace(']', '')
+            resp = {}
+            cmd = stt
+            if len(str_data) == 0:
+                resp["command"] = stt
+                resp = make_response(resp)
+
+            else:
+                resp = make_response(str_data)
+
+                dic = json.loads(str_data)
+                cmd = dic["command"]
+            print(cmd)
+
+            return resp
+
+    except Exception as e:
+        return {'error': str(e)}
 
 
 if __name__ == '__main__':
