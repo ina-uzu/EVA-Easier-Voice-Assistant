@@ -79,7 +79,7 @@ If you wish to contribute to our project, please please do not hesitate to [cont
 ## Build Process
 **Docker is required if you wish to develop by yourself.**  
 
-http://15.164.50.174:5000/
+http://54.180.120.132:5000/
 
 // docker container 목록 보기
 docker ps  ( -a : 실행 중인 것만 보기 옵션)
