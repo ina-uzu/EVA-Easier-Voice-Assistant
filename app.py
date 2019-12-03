@@ -191,4 +191,4 @@ ml_engine.identify_speaker()
 
 if __name__ == '__main__':
     ml_engine.verify_speaker('audio_data/test.wav', '230M4087')
-    app.run('0.0.0.0', port=5000, debug=True)
+    #app.run('0.0.0.0', port=5000, debug=True)
