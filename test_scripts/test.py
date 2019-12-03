@@ -5,7 +5,7 @@ import requests
 import chardet
 
 # url = "http://15.164.50.174:5000/"
-url = "http://127.0.0.1:5000/"
+url = "http://163.239.28.22:5000/"
 
 
 def get_final_cmd(stt, voice):

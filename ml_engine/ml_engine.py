@@ -2,17 +2,18 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 import scipy.io.wavfile as wav
+import librosa
 
 import pandas as pd
+import numpy as np
 import math
 import os
 import ml_engine.configure as c
 
-from ml_engine.DB_wav_reader import read_feats_structure
+from ml_engine.DB_wav_reader import read_feats_structure, read_audio
 from ml_engine.SR_Dataset import read_MFB, ToTensorTestInput
 from ml_engine.model.model import background_resnet
-from ml_engine.python_speech_features import mfcc
-from ml_engine.python_speech_features import logfbank
+from ml_engine.python_speech_features.base import fbank
 
 log_dir = 'ml_engine/model_saved' # Where the checkpoints are saved
 embedding_dir = 'ml_engine/enroll_embeddings' # Where embeddings are saved
@@ -26,16 +27,27 @@ n_classes = 240 # How many speakers in training data?
 test_frames = 100 # Split the test utterance 
 
 def wav_to_logfbank(filename):
-    print('Read .wav file '+filename)
-    (rate, sig) = wav.read(filename)
-    feature = logfbank(sig, rate, nfilt=40)
-    return feature
+    audio = read_audio(filename, c.SAMPLE_RATE)
+    filter_banks, energies = fbank(audio, samplerate = c.SAMPLE_RATE, nfilt=c.FILTER_BANK, winlen=0.025)
+
+    if c.USE_LOGSCALE:
+        filter_banks = 20 * np.log10(np.maximum(filter_banks, 1e-5))
+
+    filter_banks = normalize_frames(filter_banks, Scale=c.USE_SCALE)
+
+    return filter_banks
+
+def normalize_frames(m, Scale=True):
+    if Scale:
+        return (m - np.mean(m, axis=0)) / (np.std(m, axis=0) + 2e-12)
+    else:
+        return (m - np.mean(m, axis=0))
 
 def load_model(use_cuda, log_dir, cp_num, embedding_size, n_classes):
     model = background_resnet(embedding_size=embedding_size, num_classes=n_classes)
     if use_cuda:
         model.cuda()
-    print('=> loading checkpoint')
+    print('[ML_ENGINE]=> loading checkpoint')
     # original saved file with DataParallel
     checkpoint = torch.load(log_dir + '/checkpoint_' + str(cp_num) + '_cpu.pth')
     # create new OrderedDict that does not contain `module.`
@@ -158,14 +170,15 @@ def perform_verification(use_cuda, model, embeddings, enroll_speaker, test_filen
     score = F.cosine_similarity(test_embedding, enroll_embedding)
     score = score.data.cpu().numpy()
 
+
     print("\n[ML_ENGINE]=== Speaker verification ===")
     print("[ML_ENGINE]Score : %0.4f\n[ML_ENGINE]Threshold : %0.2f\n" %(score, thres))
 
     if score > thres:
-        print ('true')
+        print ('[ML_ENGINE]true')
         return True
 
-    print('false')
+    print('[ML_ENGINE]false')
     return False
 
 #init engine
@@ -199,7 +212,7 @@ IN
 RETURNS 
     - verification result in True or False.
 '''
-def verifiy_speaker(file_path, speaker_id):
+def verify_speaker(file_path, speaker_id):
     # Set SPEAKER_ID for test (dummy)
     speaker_id = '230M4087'
 
