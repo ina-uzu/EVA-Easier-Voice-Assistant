@@ -4,6 +4,7 @@ from flask import Flask, make_response
 from flask import request
 from flask_restplus import Resource, Api, fields
 from dao import userdao, shortcutdao
+from ml_engine import ml_engine
 
 app = Flask(__name__)
 api = Api(app, version='1.0', title='EVA API', description='Easier Voice Assistant')
@@ -181,6 +182,14 @@ class CmdManager(Resource):
         except Exception as e:
             return {'error': str(e)}
 
+'''
+ml_engine.enroll_speaker()
+ml_engine.verify_speaker()
+ml_engine.identify_speaker()
+'''
+
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=5000, debug=True)
+    ml_engine.enroll_speaker('audio_data/enroll.wav', '1')
+    ml_engine.verify_speaker('audio_data/test.wav', '1')
+    #app.run('0.0.0.0', port=5000, debug=True)
