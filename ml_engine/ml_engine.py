@@ -44,15 +44,17 @@ def normalize_frames(m, Scale=True):
         return (m - np.mean(m, axis=0))
 
 def load_model(use_cuda, log_dir, cp_num, embedding_size, n_classes):
+    print("\n[ML_ENGINE] ======== Load model ========")
     model = background_resnet(embedding_size=embedding_size, num_classes=n_classes)
     if use_cuda:
         model.cuda()
-    print('[ML_ENGINE]=> loading checkpoint')
     # original saved file with DataParallel
     checkpoint = torch.load(log_dir + '/checkpoint_' + str(cp_num) + '_cpu.pth')
     # create new OrderedDict that does not contain `module.`
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
+    print('[ML_ENGINE] load success')
+    print("[ML_ENGINE] ============================")
     return model
 
 def get_embeddings(use_cuda, filename, model, test_frames):
@@ -111,10 +113,10 @@ def perform_identification(use_cuda, model, embeddings, test_filename, test_fram
         if score > max_score:
             max_score = score
             best_spk = spk
-    #print("Speaker identification result : %s" %best_spk)
-    true_spk = '230M4087'
-    print("\n[ML_ENGINE]=== Speaker identification ===")
-    print("[ML_ENGINE]Predicted speaker : %s\n" %(best_spk))
+
+    print("\n[ML_ENGINE] == Speaker identification ==")
+    print("[ML_ENGINE] Predicted speaker : %s" %(best_spk))
+    print("[ML_ENGINE] ============================")
     return best_spk
 
 def perform_verification(use_cuda, model, embeddings, enroll_speaker, test_filename, test_frames, thres):
@@ -125,14 +127,16 @@ def perform_verification(use_cuda, model, embeddings, enroll_speaker, test_filen
     score = score.data.cpu().numpy()
 
 
-    print("\n[ML_ENGINE]=== Speaker verification ===")
-    print("[ML_ENGINE]Score : %0.4f\n[ML_ENGINE]Threshold : %0.2f\n" %(score, thres))
+    print("\n[ML_ENGINE] === Speaker verification ===")
+    print("[ML_ENGINE] Score     : %0.4f\n[ML_ENGINE] Threshold : %0.4f" %(score, thres))
 
     if score > thres:
-        print ('[ML_ENGINE]true')
+        print ('[ML_ENGINE] Result    : true')
+        print("[ML_ENGINE] ============================")
         return True
 
-    print('[ML_ENGINE]false')
+    print('[ML_ENGINE] Result    : false')
+    print("[ML_ENGINE] ============================")
     return False
 
 #init engine
@@ -156,11 +160,13 @@ def enroll_speaker(file_path, speaker_id):
     if not os.path.exists(embedding_dir):
         os.makedirs(embedding_dir)
 
-    print("[ML_ENGINE]Saving embeddings of speaker ", speaker_id)
+    print("\n[ML_ENGINE] ==== Speaker enrollment ====")
+    print("[ML_ENGINE] New speaker id :", speaker_id)
     embedding_path = os.path.join(embedding_dir, speaker_id+'.pth')
     torch.save(speaker_id, embedding_path)
 
     embeddings[speaker_id] = activation
+    print("[ML_ENGINE] ============================")
 
 '''
 IN 
@@ -188,7 +194,7 @@ def verify_speaker(file_path, speaker_id):
     return perform_verification(use_cuda, model, embeddings, speaker_id, file_path, test_frames, thres)
 
 def main():
-    print('[ML_ENGINE]Hello from ml_engine!')
+    print(' [ML_ENGINE]Hello from ml_engine!')
 
 if __name__ == '__main__':
     main()
