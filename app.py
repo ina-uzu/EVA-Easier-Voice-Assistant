@@ -243,5 +243,35 @@ def nugu_test():
         return {'error': str(e)}
 
 
+@app.route('/', methods=['GET'])
+def nugu_test_2():
+    try:
+        print(request.args)
+
+        if 'stt' in request.args:
+            stt = request.args['stt']
+            voice = 'TEST'
+            user_id = 1
+
+            str_data = shortcutdao.find_by_keyword(user_id, stt).replace('[', '').replace(']', '')
+            resp = {}
+            cmd = stt
+            if len(str_data) == 0:
+                resp["command"] = stt
+                resp = make_response(resp)
+
+            else:
+                resp = make_response(str_data)
+
+                dic = json.loads(str_data)
+                cmd = dic["command"]
+            print(cmd)
+
+            return resp
+
+    except Exception as e:
+        return {'error': str(e)}
+
+
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
