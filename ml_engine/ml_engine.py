@@ -55,21 +55,7 @@ def load_model(use_cuda, log_dir, cp_num, embedding_size, n_classes):
     model.eval()
     return model
 
-def split_enroll_and_test(dataroot_dir):
-    DB_all = read_feats_structure(dataroot_dir)
-    enroll_DB = pd.DataFrame()
-    test_DB = pd.DataFrame()
-    
-    enroll_DB = DB_all[DB_all['filename'].str.contains('enroll.p')]
-    test_DB = DB_all[DB_all['filename'].str.contains('test.p')]
-    
-    # Reset the index
-    enroll_DB = enroll_DB.reset_index(drop=True)
-    test_DB = test_DB.reset_index(drop=True)
-    return enroll_DB, test_DB
-
 def get_embeddings(use_cuda, filename, model, test_frames):
-    #input, label = read_MFB(filename) # input size:(n_frames, n_dims)
     input = wav_to_logfbank(filename)
 
     tot_segments = math.ceil(len(input)/test_frames) # total number of segments with 'test_frames' 
@@ -101,44 +87,12 @@ def l2_norm(input, alpha):
     output = output * alpha
     return output
 
-def enroll_per_spk(use_cuda, test_frames, model, DB, embedding_dir):
-    """
-    Output the averaged d-vector for each speaker (enrollment)
-    Return the dictionary (length of n_spk)
-    """
-    n_files = len(DB) # 10
-    enroll_speaker_list = sorted(set(DB['speaker_id']))
-    
-    embeddings = {}
-    
-    # Aggregates all the activations
-    print("[ML_ENGINE]Start to aggregate all the d-vectors per enroll speaker")
-    
-    for i in range(n_files):
-        filename = DB['filename'][i]
-        spk = DB['speaker_id'][i]
-        
-        activation = get_embeddings(use_cuda, filename, model, test_frames)
-        if spk in embeddings:
-            embeddings[spk] += activation
-        else:
-            embeddings[spk] = activation
-            
-        print("[ML_ENGINE]Aggregates the activation (spk : %s)" % (spk))
-        
-    if not os.path.exists(embedding_dir):
-        os.makedirs(embedding_dir)
-        
-    # Save the embeddings
-    for spk_index in enroll_speaker_list:
-        embedding_path = os.path.join(embedding_dir, spk_index+'.pth')
-        torch.save(embeddings[spk_index], embedding_path)
-        print("[ML_ENGINE]Save the embeddings for %s" % (spk_index))
-    return embeddings
-
 def load_enroll_embeddings(embedding_dir):
     embeddings = {}
+
     for f in os.listdir(embedding_dir):
+        if f[0] == '.':
+            continue
         spk = f.replace('.pth','')
         # Select the speakers who are in the 'enroll_spk_list'
         embedding_path = os.path.join(embedding_dir, f)
@@ -183,9 +137,8 @@ def perform_verification(use_cuda, model, embeddings, enroll_speaker, test_filen
 
 #init engine
 model = load_model(use_cuda, log_dir, cp_num, embedding_size, n_classes)
-enroll_DB, test_DB = split_enroll_and_test(c.TEST_FEAT_DIR)
 embeddings = load_enroll_embeddings(embedding_dir)
-spk_list = ['103F3021', '207F2088', '213F5100', '217F3038', '225M4062', '229M2031', '230M4087', '233F4013', '236M3043', '240M3063']
+spk_list = [*embeddings]
 thres = 0.95
 
 '''
@@ -196,28 +149,18 @@ IN
 RETURNS 
     - NONE
 '''
-def enroll_speaker(file_path, id):
-    # Where to save embeddings
-    embedding_dir = 'ml_engine/enroll_embeddings'
-    
-    # Perform the enrollment and save the results
-    enroll_per_spk(use_cuda, test_frames, model, enroll_DB, embedding_dir)
+def enroll_speaker(file_path, speaker_id):
+    # Get activation, which is used as embedding
+    activation = get_embeddings(use_cuda, file_path, model, test_frames)
 
+    if not os.path.exists(embedding_dir):
+        os.makedirs(embedding_dir)
 
-'''
-IN 
-    - file_path : path of the audio data in .wav format
-    - speaker_id: speaker id to be verified.
+    print("[ML_ENGINE]Saving embeddings of speaker ", speaker_id)
+    embedding_path = os.path.join(embedding_dir, speaker_id+'.pth')
+    torch.save(speaker_id, embedding_path)
 
-RETURNS 
-    - verification result in True or False.
-'''
-def verify_speaker(file_path, speaker_id):
-    # Set SPEAKER_ID for test (dummy)
-    speaker_id = '230M4087'
-
-    # Perform the test 
-    return perform_verification(use_cuda, model, embeddings, speaker_id, file_path, test_frames, thres)
+    embeddings[speaker_id] = activation
 
 '''
 IN 
@@ -229,6 +172,20 @@ RETURNS
 def identify_speaker(file_path):
     # Perform the test 
     return perform_identification(use_cuda, model, embeddings, file_path, test_frames, spk_list)
+
+'''
+IN 
+    - file_path : path of the audio data in .wav format
+    - speaker_id: speaker id to be verified.
+
+RETURNS 
+    - verification result in True or False.
+'''
+def verify_speaker(file_path, speaker_id):
+    # Set SPEAKER_ID for test (dummy)
+
+    # Perform the test 
+    return perform_verification(use_cuda, model, embeddings, speaker_id, file_path, test_frames, thres)
 
 def main():
     print('[ML_ENGINE]Hello from ml_engine!')
