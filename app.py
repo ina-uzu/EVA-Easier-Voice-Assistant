@@ -1,4 +1,5 @@
 import json
+# -*- coding: utf-8 -*-
 
 from flask import Flask, make_response
 from flask import request
@@ -10,7 +11,7 @@ api = Api(app, version='1.0', title='EVA API', description='Easier Voice Assista
 ns = api.namespace('user', description='User CRD')
 sc_ns = api.namespace('shortcut', description='Shortcut CRD')
 stt_ns = api.namespace('stt', description='stt 전송')
-cmd_ns = api.namespace('cmd', description='음성 + 단축키와 맵핑된 최종 명령어')
+cmd_ns = api.namespace('cmd', description='음성 + STT를 통해 단축키에 맵핑된 명령어 조회')
 
 user_model = api.model('Model', {
     'id': fields.Integer,
@@ -136,50 +137,56 @@ class ShortcutMangerWithUser(Resource):
             return {'error': str(e)}
 
 
-@stt_ns.route('/', methods=['POST'])
-class DeviceManager(Resource):
-    def post(self):
-        try:
-            if 'stt' in request.args:
-                stt = request.args['stt']
-                return stt
-            else:
-                print("stt REQUIRED")
 
-        except Exception as e:
-            return {'error': str(e)}
+import wave
 
 
 @cmd_ns.route('/', methods=['POST'])
 class CmdManager(Resource):
-    @cmd_ns.param('stt', '단축키')
     @cmd_ns.param('voice', '사용자 음성')
     def post(self):
         try:
-            if 'stt' in request.args and 'voice' in request.args:
-                stt = request.args['stt']
-                voice = request.args['voice']
 
-                user_id = 13
-                # user_id = mlModel.getUserInfo(voice)
+            idx = request.data.find(b'!') + 1
+            stt = request.data[0:idx-1].decode()
+            voice = request.data[idx:]
 
-                str_data = shortcutdao.find_by_keyword(user_id, stt).replace('[','').replace(']','')
-                resp = {}
+            print("[cmd] STT : ", stt)
+            print("[cmd] WAVE FILE SIZE : ", len(voice))
 
-                if len(str_data) == 0:
-                    resp["command"] = stt
-                    resp = make_response(resp)
+            sample_rate = 16000  # hertz
 
-                else:
-                    resp = make_response(str_data)
+            obj = wave.open('data/new.wav', 'wb')
+            obj.setnchannels(1)  # mono
+            obj.setsampwidth(2)
+            obj.setframerate(sample_rate)
+            obj.writeframes(voice)
+            obj.close()
 
-                return resp
+            print("[cmd] new.wav created")
+
+            user_id = 1
+            # user_id = mlModel.getUserInfo(voice)
+
+            str_data = shortcutdao.find_by_keyword(user_id, stt).replace('[','').replace(']','')
+
+            resp = {}
+
+            if len(str_data) == 0:
+                resp["command"] = stt
+                resp = make_response(resp)
 
             else:
-                print("stt & voice REQUIRED")
+                resp = make_response(str_data)
+
+            return resp
 
         except Exception as e:
+            print("[cmd] Error! ", str(e))
             return {'error': str(e)}
+
+
+
 
 
 if __name__ == '__main__':
