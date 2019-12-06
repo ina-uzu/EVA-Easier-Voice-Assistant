@@ -16,8 +16,9 @@ import numpy as np
 import pandas as pd
 
 from ml_engine.configure import SAMPLE_RATE
+import sys
 
-np.set_printoptions(threshold=np.nan)
+np.set_printoptions(threshold=sys.maxsize)
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)

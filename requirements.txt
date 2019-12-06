@@ -7,8 +7,8 @@
 aniso8601==8.0.0
 asn1crypto==0.24.0
 audioread==2.1.4
-blas==1.0
-bzip2==1.0.8
+#blas
+#bzip2==1.0.8
 certifi==2018.8.24
 cffi==1.11.5
 click==7.0
@@ -18,13 +18,12 @@ decorator==4.4.1
 flask==1.1.1
 flask-restful==0.3.7
 flask-restplus==0.11.0
-freetype==2.8
+#freetype
 idna==2.7
-intel-openmp==2019.4
+intel-openmp
 itsdangerous==1.1.0
 jinja2==2.10.3
 joblib==0.14.0
-jpeg==9b
 jsonschema==2.6.0
 libcxx==4.0.1
 libcxxabi==4.0.1
@@ -47,7 +46,7 @@ olefile==0.46
 openssl==1.0.2t
 pandas==0.23.4
 pillow==5.1.0
-pip==10.0.1
+pip==19.3.1
 pycparser==2.19
 pymysql==0.9.2
 pyparsing==2.4.5
