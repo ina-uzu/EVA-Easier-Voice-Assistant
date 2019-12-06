@@ -1,6 +1,6 @@
 <p align="center">
   <a href="http://cscp2.sogang.ac.kr/CSE4187/index.php/EVA(Easier_Voice_Assistant)">
-    <img title="Logo" src="logo.png" width=500>
+    <img title="Logo" src="img/logo.png" width=500>
   </a>
 </p>
 
@@ -52,11 +52,11 @@
 ## Showcase
 
 <p align="center">
-  <img src = "motivation.png" width=700>
+  <img src = "img/motivation.png" width=700>
 </p>
 
 <p align="center">
-  <img src = "diagram.png" width=700>
+  <img src = "img/diagram.png" width=700>
 </p>
 
 
@@ -95,7 +95,7 @@ docker run -d -p 5000:5000 --name eva eva
 ## Authors
 
 * **Min Woo Kim** - *ML engineer* - [JoeyValentine](https://github.com/JoeyValentine)
-* **James Lee** - *ML engineer* - [James Lee](https://github.com/destructions)
+* **Kyu Yeon Lee** - *ML engineer* - [Destructions](https://github.com/destructions)
 * **Ina Song** *Server engineer* - [ina-uzu](https://github.com/ina-uzu)
 * **Joohan Lee** *Server engineer* - [joohan1030](https://github.com/joohan1030)
 
