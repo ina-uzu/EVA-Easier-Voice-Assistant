@@ -148,6 +148,7 @@ class CmdManager(Resource):
     def post(self):
         try:
 
+            print(request.data[0:30])
             idx = request.data.find(b'!') + 1
             stt = request.data[0:idx-1].decode()
             voice = request.data[idx:]
@@ -167,8 +168,13 @@ class CmdManager(Resource):
             print("[cmd] new.wav created")
 
             user_id = 1
+            
             # user_id = mlModel.getUserInfo(voice)
+            str_id = ml_engine.identify_speaker('data/new.wav')
+            ml_engine.verify_speaker('data/new.wav', '1')
 
+            print("RES ", str_id)
+            
             str_data = shortcutdao.find_by_keyword(user_id, stt).replace('[','').replace(']','')
 
             resp = {}
@@ -186,17 +192,8 @@ class CmdManager(Resource):
             print("[cmd] Error! ", str(e))
             return {'error': str(e)}
 
-'''
-ml_engine.enroll_speaker()
-ml_engine.verify_speaker()
-ml_engine.identify_speaker()
-'''
-
-
-
-
-
 if __name__ == '__main__':
-    ml_engine.enroll_speaker('audio_data/enroll.wav', '1')
-    ml_engine.verify_speaker('audio_data/test.wav', '1')
-    app.run('0.0.0.0', port=5000, debug=True)
+   ml_engine.enroll_speaker('data/james.wav', '1')
+   ml_engine.enroll_speaker('data/minwoo.wav', '2')
+   ml_engine.enroll_speaker('data/ina.wav', '3')
+   app.run('0.0.0.0', port=5000, debug=True)
