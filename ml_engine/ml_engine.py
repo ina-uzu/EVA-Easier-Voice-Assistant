@@ -10,8 +10,8 @@ import math
 import os
 import ml_engine.configure as c
 
-from ml_engine.DB_wav_reader import read_feats_structure, read_audio
-from ml_engine.SR_Dataset import read_MFB, ToTensorTestInput
+from ml_engine.DB_wav_reader import read_audio
+from ml_engine.SR_Dataset import ToTensorTestInput
 from ml_engine.model.model import background_resnet
 from ml_engine.python_speech_features.base import fbank
 
@@ -163,7 +163,7 @@ def enroll_speaker(file_path, speaker_id):
     print("\n[ML_ENGINE] ==== Speaker enrollment ====")
     print("[ML_ENGINE] New speaker id :", speaker_id)
     embedding_path = os.path.join(embedding_dir, speaker_id+'.pth')
-    torch.save(speaker_id, embedding_path)
+    torch.save(activation, embedding_path)
 
     embeddings[speaker_id] = activation
     print("[ML_ENGINE] ============================")
@@ -194,7 +194,7 @@ def verify_speaker(file_path, speaker_id):
     return perform_verification(use_cuda, model, embeddings, speaker_id, file_path, test_frames, thres)
 
 def main():
-    print(' [ML_ENGINE]Hello from ml_engine!')
+    print('[ML_ENGINE] Hello from ml_engine!')
 
 if __name__ == '__main__':
     main()
