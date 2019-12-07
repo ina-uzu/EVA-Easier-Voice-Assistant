@@ -192,16 +192,6 @@ class CmdManager(Resource):
             print("[cmd] Error! ", str(e))
             return {'error': str(e)}
 
-'''
-ml_engine.enroll_speaker()
-ml_engine.verify_speaker()
-ml_engine.identify_speaker()
-'''
-
-
-
-
-
 if __name__ == '__main__':
    ml_engine.enroll_speaker('data/james.wav', '1')
    ml_engine.enroll_speaker('data/minwoo.wav', '2')
