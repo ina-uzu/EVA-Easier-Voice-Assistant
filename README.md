@@ -12,7 +12,7 @@
         <img src="https://img.shields.io/badge/flask-v1.1.1-blue.svg?logo=flask&logoColor=white">
     </a>
     <a href="https://pytorch.org/">
-        <img src="https://img.shields.io/badge/pytorch-v1.0.0-blue.svg?logo=pytorch&logoColor=white">
+        <img src="https://img.shields.io/badge/pytorch-v1.3.1-blue.svg?logo=pytorch&logoColor=white">
     </a>
     <a href="https://www.docker.com/">
         <img src="https://img.shields.io/badge/Install with-docker-blue.svg?logo=docker&logoColor=white">
