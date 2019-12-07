@@ -14,9 +14,6 @@
     <a href="https://pytorch.org/">
         <img src="https://img.shields.io/badge/pytorch-v1.0.0-blue.svg?logo=pytorch&logoColor=white">
     </a>
-    <a href="https://www.anaconda.com/">
-        <img src="https://img.shields.io/badge/anaconda-v4.7.12-blue.svg?style=flat&logo=anaconda&logoColor=white">
-    </a>
     <a href="https://www.docker.com/">
         <img src="https://img.shields.io/badge/Install with-docker-blue.svg?logo=docker&logoColor=white">
     </a>
@@ -79,17 +76,17 @@ If you wish to contribute to our project, please please do not hesitate to [cont
 ## Build Process
 **Docker is required if you wish to develop by yourself.**  
 
-http://54.180.120.132:5000/
+http://54.180.120.132:5000/  
 
-// docker container 목록 보기
-docker ps  ( -a : 실행 중인 것만 보기 옵션)
+// docker container 목록 보기  
+docker ps  ( -a : 실행 중인 것만 보기 옵션)  
 
-// docker image & container 새로 생성 및 run
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
-docker rmi 
-docker build -t eva .
-docker run -d -p 5000:5000 --name eva eva
+// docker image & container 새로 생성 및 run  
+docker stop $(docker ps -a -q)  
+docker rm $(docker ps -a -q)  
+docker rmi  
+docker build -t eva .  
+docker run -d -p 5000:5000 --name eva eva  
 
 
 ## Authors
