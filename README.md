@@ -42,8 +42,8 @@
 
 ## Features
 
-- Users can register various functions with their own shortcut keys and enjoy them faster and easier.
-- By distinguishing the speaker based on the voice, the same voice input performs different functions for each user.
+- Users can register various functions supported by AI speakers with their own shortcut keys.
+- By distinguishing the speaker based on the voice, the same setence pronounced by each user performs different functions.
 
 
 ## Showcase
@@ -76,17 +76,9 @@ If you wish to contribute to our project, please please do not hesitate to [cont
 ## Build Process
 **Docker is required if you wish to develop by yourself.**  
 
-http://54.180.120.132:5000/  
-
-// docker container 목록 보기  
-docker ps  ( -a : 실행 중인 것만 보기 옵션)  
-
-// docker image & container 새로 생성 및 run  
-docker stop $(docker ps -a -q)  
-docker rm $(docker ps -a -q)  
-docker rmi  
-docker build -t eva .  
-docker run -d -p 5000:5000 --name eva eva  
+1. Clone or download the repo.
+2. <code>docker build -t IMAGE_NAME PATH</code>
+3. <code>docker run -d -p CONTAINER_PORT:HOST_PORT --name CONTAINER_NAME IMAGE_NAME</code>
 
 
 ## Authors
